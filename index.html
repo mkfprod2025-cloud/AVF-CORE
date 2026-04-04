@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>COCKPIT CRISIS v5.4.4</title>
+    <title>COCKPIT CRISIS v5.4.5</title>
     <link rel="icon" type="image/x-icon" href="avficon.ico">
     <style>
         :root { --bg: #000000; --accent: #00FFFF; --text-light: #ffffff; --restored: #0000FF; }
@@ -12,47 +12,40 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg); color: var(--text-light); min-height: 100vh; 
             display: flex; flex-direction: column; align-items: center;
-            overflow-x: hidden; overflow-y: auto; padding: env(safe-area-inset-top) 10px 100px 20px; /* Padding bottom augmenté pour le confort */
+            overflow-x: hidden; overflow-y: auto; padding: env(safe-area-inset-top) 10px 100px 20px;
         }
         .header { width: 100%; text-align: center; padding: 5px 15px; display: flex; justify-content: space-between; align-items: center; }
         .title { font-size: 1.1rem; font-weight: 900; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }     
         .restored-badge { font-size: 0.6rem; color: #FFF; background: var(--restored); padding: 2px 5px; border-radius: 3px; font-weight: bold; margin-left: 5px; }  
-        #sync-status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 5px; background: #333; color: #aaa; }
+        #sync-status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 5px; background: #333; color: #aaa; cursor: pointer; }
         #sync-status.online { background: #004400; color: #00FF00; }
         #crisis-banner { display: none; width: 100%; background: #FF0000; color: white; padding: 12px; text-align: center; font-weight: 900; border: 3px solid white; border-radius: 10px; margin-bottom: 15px; animation: blink-red 1s infinite; }
         @keyframes blink-red { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-        
-        .grid-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; flex-grow: 1; justify-content: center; } /* Gap augmenté */
-        .grid-row { display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; width: 100%; gap: 15px; } /* Gap augmenté */
-        
-        .btn-circle { width: 62px; height: 62px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 900; border: 3px solid #FFF; color: #000; cursor: pointer; }
+        .grid-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 15px; flex-grow: 1; justify-content: center; }
+        .grid-row { display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; width: 100%; gap: 15px; }        
+        .btn-circle { width: 62px; height: 62px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 900; border: 3px solid #FFF; color: #000; cursor: pointer; transition: opacity 0.2s; }
         .btn-circle i { font-size: 1.6rem; font-style: normal; margin-bottom: 2px; }
-        
+        .btn-circle.disabled { opacity: 0.3 !important; cursor: not-allowed; pointer-events: none; }
         #crisis-log { width: 100%; height: 80px; background: #111; border: 1px solid #333; border-radius: 8px; margin: 15px 0; padding: 8px; overflow-y: auto; font-family: monospace; font-size: 0.75rem; color: #00FF00; line-height: 1.2; }
         .action-row { display: flex; justify-content: center; width: 100%; gap: 15px; }
-        
         .btn-wide { flex: 1; height: 75px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 900; border: 3px solid #FFF; color: #000; cursor: pointer; }
         .btn-wide i { font-size: 2rem; font-style: normal; }     
-
-        /* --- COULEURS ORIGINALES --- */
         .btn-eau { background: #00FFFF; } .btn-nasal { background: #0080FF; } .btn-zombie { background: #FFFF00; border: 5px solid #FF0000; }
         .btn-fin { background: #FFF; border: 4px solid #00FF00; color: #000; } .btn-fin.active { background: #00FF00; color: #000; box-shadow: 0 0 30px #00FF00; border: 5px solid #FFF; }
         .btn-cafe { background: #FF00FF; } .btn-epaule { background: #FF0000; } .btn-night { background: #FFD700; }
         .btn-grign { background: #FFFF00; } .btn-agite { background: #FF00FF; } .btn-repas { background: #FF4500; }
         .btn-oeil { background: #FF0000; } .btn-ejection { background: #FF8C00; } .btn-menthe { background: #98FB98; }
         .btn-reson { background: #9370DB; } .btn-chal { background: #FFFF00; }
-
         #clock { font-family: monospace; font-size: 2.2rem; color: var(--accent); font-weight: 900; text-align: center; margin-bottom: 10px; text-shadow: 0 0 10px var(--accent); }
         .footer-nav { width: 100%; display: flex; justify-content: space-between; padding: 15px 0; border-top: 1px solid #333; position: sticky; bottom: 0; background: #000; }  
         .nav-link { color: #00FFFF; text-decoration: none; font-weight: bold; font-size: 0.8rem; border: 1px solid #00FFFF; padding: 5px 10px; border-radius: 5px; }
-        .undo { color: #FF0000; border-color: #FF0000; }
         .sync-btn { color: #00FF00; font-weight: 900; cursor: pointer; background: #002200; padding: 8px 15px; border-radius: 10px; border: 2px solid #00FF00; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="title">COCKPIT v5.4.4 <span class="restored-badge">MKFPROD</span></div>
-        <div id="sync-status">LINKING...</div>     
+        <div class="title">COCKPIT v5.4.5 <span class="restored-badge">MKFPROD</span></div>
+        <div id="sync-status" onclick="fetchProxy()">LINKING...</div>     
     </div>
     <div id="crisis-banner">🚨 CRISE EN COURS 🚨</div>
     <div class="grid-container">
@@ -85,11 +78,12 @@
     <div class="footer-nav">
         <a href="archive.html" class="nav-link">📚 ARCHIVES</a>       
         <div class="sync-btn" onclick="sync()">ENVOYER ⬆️</div>
-        <div class="nav-link undo" onclick="undo()">UNDO ↩️</div>
+        <div id="undo-btn" class="nav-link" style="color:#FF0000; border-color:#FF0000;" onclick="undo()">ANNULER ↩️</div>
     </div>
     <script>
         let localQueue = JSON.parse(localStorage.getItem('avf_queue') || '[]');
         let proxyUrl = "";
+        let isClickLocked = false;
 
         function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }
         setInterval(updateClock, 1000); updateClock();
@@ -99,37 +93,39 @@
             const isFinClicked = localQueue.some(e => e.event === 'FIN DE CRISE');
             document.getElementById('crisis-banner').style.display = (hasEvents && !isFinClicked) ? 'block' : 'none';
             document.getElementById('btn-fin').classList.toggle('active', hasEvents && !isFinClicked);
-            
             const logDiv = document.getElementById('crisis-log');
             if(hasEvents) {
                 logDiv.innerHTML = localQueue.map(e => {
                     const t = e.time ? (e.time.includes('T') ? e.time.split('T')[1].substring(0,8) : e.time) : "??:??";
                     return `[${t}] ${e.event}`;
                 }).reverse().join('<br>');
-            } else {
-                logDiv.innerHTML = "En attente d'événements...";
-            }
+            } else { logDiv.innerHTML = "En attente d'événements..."; }
         }
 
         async function fetchProxy() {
+            document.getElementById('sync-status').innerText = "LINKING...";
             try {
                 const r = await fetch('https://raw.githubusercontent.com/mkfprod2025-cloud/AVF-CORE/main/proxy_url.json?v=' + Date.now());
                 const d = await r.json(); proxyUrl = d.url;
                 document.getElementById('sync-status').innerText = "LINKED ✔️";
                 document.getElementById('sync-status').classList.add('online');
-            } catch(e) { document.getElementById('sync-status').innerText = "OFFLINE ❌"; }
+            } catch(e) { document.getElementById('sync-status').innerText = "OFFLINE ❌"; document.getElementById('sync-status').classList.remove('online'); }
         }
         fetchProxy();
 
         function log(event, element) {
+            if (isClickLocked) return;
             let pwd = localStorage.getItem('avf_pwd');
             if (pwd !== '152397') {
                 pwd = prompt("CODE MKFPROD :");
                 if (pwd === '152397') localStorage.setItem('avf_pwd', pwd); else return;
             }
-            if (element) { element.style.opacity = "0.5"; setTimeout(() => { element.style.opacity = "1"; }, 100); }
+            // Verrou anti-double-clic (2s)
+            isClickLocked = true;
+            if (element) element.classList.add('disabled');
+            setTimeout(() => { isClickLocked = false; if (element) element.classList.remove('disabled'); }, 2000);
+
             if (navigator.vibrate) navigator.vibrate(50);
-            
             localQueue.push({ event, time: new Date().toISOString() });
             localStorage.setItem('avf_queue', JSON.stringify(localQueue));
             checkUIState();
@@ -140,20 +136,16 @@
             const pwd = localStorage.getItem('avf_pwd');
             if (!proxyUrl) { await fetchProxy(); if(!proxyUrl) return alert("Proxy introuvable."); }
             
-            // Nettoyage des données pour éviter l'erreur de parsing
             const cleanData = localQueue.map(e => ({ event: e.event, time: e.time }));
-
             fetch(proxyUrl + '/sync', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ events: cleanData, pwd: pwd })
             }).then(r => r.json()).then(d => {
                 if(d.status === 'success') {
-                    alert("Envoyé !");
-                    localQueue = []; localStorage.setItem('avf_queue', '[]');
-                    checkUIState();
-                } else { alert("Erreur : " + d.message); }
-            }).catch(() => alert("DataCave injoignable."));
+                    alert("Envoyé !"); localQueue = []; localStorage.setItem('avf_queue', '[]'); checkUIState();
+                } else { alert("Erreur : " + d.message); fetchProxy(); }
+            }).catch(() => { alert("DataCave injoignable. Tentative de reconnexion..."); fetchProxy(); });
         }
 
         function undo() { if (localQueue.length > 0 && confirm("Annuler ?")) { localQueue.pop(); localStorage.setItem('avf_queue', JSON.stringify(localQueue)); checkUIState(); } }

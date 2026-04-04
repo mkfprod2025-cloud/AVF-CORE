@@ -5,33 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARCHIVES AVF - MKFPROD</title>
     <style>
-        body { background: #000; color: #FFF; font-family: monospace; padding: 15px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00FFFF; padding-bottom: 10px; margin-bottom: 20px; }
-        .title { font-size: 1.2rem; font-weight: 900; color: #00FFFF; text-transform: uppercase; }
-        .nav-back { color: #FFF; text-decoration: none; border: 1px solid #FFF; padding: 5px 12px; border-radius: 5px; font-weight: bold; }
+        body { background: #000; color: #FFF; font-family: monospace; padding: 15px; padding-bottom: 50px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00FFFF; padding-bottom: 10px; margin-bottom: 25px; position: sticky; top: 0; background: #000; z-index: 10; }
+        .title { font-size: 1.2rem; font-weight: 900; color: #00FFFF; text-transform: uppercase; letter-spacing: 2px; }
+        .nav-back { color: #FFF; text-decoration: none; border: 1px solid #FFF; padding: 5px 12px; border-radius: 5px; font-weight: bold; font-size: 0.8rem; }
         
-        .crisis-block { border: 1px solid #333; margin-bottom: 20px; padding: 0; border-radius: 8px; overflow: hidden; background: #050505; }
-        .crisis-header { background: #111; padding: 10px; font-size: 0.8rem; display: flex; justify-content: space-between; border-bottom: 1px solid #222; }
-        .date { color: #00FFFF; font-weight: bold; }
-        .status { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
-        .status-pending { background: #444400; color: #FFFF00; }
-        .status-sync { background: #004400; color: #00FF00; }
+        .crisis-block { border: 2px solid #333; margin-bottom: 30px; padding: 0; border-radius: 12px; overflow: hidden; background: #080808; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .crisis-header { background: #1a1a1a; padding: 12px; font-size: 0.85rem; display: flex; justify-content: space-between; border-bottom: 2px solid #333; }
+        .date { color: #00FFFF; font-weight: 900; }
+        .status { font-size: 0.7rem; padding: 3px 10px; border-radius: 5px; font-weight: bold; text-transform: uppercase; }
+        .status-pending { background: #444400; color: #FFFF00; border: 1px solid #FFFF00; }
+        .status-sync { background: #004400; color: #00FF00; border: 1px solid #00FF00; }
         
-        .events-area { padding: 10px; }
-        .event-line { border-left: 3px solid #00FFFF; padding-left: 12px; margin: 5px 0; font-size: 0.85rem; line-height: 1.4; }
-        .time { color: #008888; font-weight: bold; margin-right: 8px; }
-        .label { color: #00FF00; font-weight: 900; }
+        .events-area { padding: 15px; background: #050505; }
+        .event-line { border-left: 4px solid #00FFFF; padding-left: 15px; margin: 8px 0; font-size: 0.9rem; line-height: 1.5; position: relative; }
+        .event-line::before { content: "●"; position: absolute; left: -7px; top: 0; color: #00FFFF; font-size: 0.8rem; }
+        .time { color: #008888; font-weight: bold; margin-right: 10px; font-size: 0.8rem; }
+        .label { color: #00FF00; font-weight: 900; text-shadow: 0 0 5px rgba(0,255,0,0.3); }
 
-        #loading { text-align: center; color: #00FFFF; font-size: 1.2rem; margin-top: 50px; }
+        #loading { text-align: center; color: #00FFFF; font-size: 1.2rem; margin-top: 100px; font-weight: 900; letter-spacing: 3px; }
+        .separator { height: 2px; background: linear-gradient(90deg, transparent, #00FFFF, transparent); margin: 10px 0; opacity: 0.3; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="title">LA GRANDE LIBRAIRIE</div>
-        <a href="index.html" class="nav-back">RETOUR</a>
+        <div class="title">LIBRAIRIE</div>
+        <a href="index.html" class="nav-back">⬅️ RETOUR</a>
     </div>
 
-    <div id="loading">SYNCHRONISATION DES ARCHIVES...</div>
+    <div id="loading">SCANNING GITHUB...</div>
     <div id="content"></div>
 
     <script>
@@ -39,13 +41,13 @@
         
         async function load() {
             try {
-                const r = await fetch(`https://api.github.com/repos/${GH_REPO}/issues?labels=crisis-log&state=all&per_page=25`);
+                const r = await fetch(`https://api.github.com/repos/${GH_REPO}/issues?labels=crisis-log&state=all&per_page=30&v=${Date.now()}`);
                 const issues = await r.json();
                 document.getElementById('loading').style.display = 'none';
                 const container = document.getElementById('content');
 
                 if (!issues.length) {
-                    container.innerHTML = "<div style='text-align:center;color:#444;margin-top:50px;'>Aucune archive disponible.</div>";
+                    container.innerHTML = "<div style='text-align:center;color:#444;margin-top:100px;font-weight:900;'>AUCUNE ARCHIVE RÉCENTE</div>";
                     return;
                 }
 
@@ -62,12 +64,12 @@
                                 const t = e.time ? (e.time.includes('T') ? e.time.split('T')[1].substring(0,5) : e.time) : "??:??";
                                 return `<div class="event-line"><span class="time">[${t}]</span> <span class="label">${e.event}</span></div>`;
                             }).join('');
-                        } catch(e) { eventsHtml = "<div style='color:red;padding:10px;'>ERREUR FORMAT DONNÉES</div>"; }
+                        } catch(e) { eventsHtml = "<div style='color:red;padding:10px;'>FORMAT ERR (OLD VERSION)</div>"; }
                     }
 
                     const date = new Date(issue.created_at).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
                     const statusClass = issue.state === 'open' ? 'status-pending' : 'status-sync';
-                    const statusText = issue.state === 'open' ? 'EN ATTENTE CAVE' : 'ARCHIVÉ CAVE';
+                    const statusText = issue.state === 'open' ? 'EN ATTENTE' : 'ARCHIVÉ';
 
                     block.innerHTML = `
                         <div class="crisis-header">
@@ -79,7 +81,7 @@
                     container.appendChild(block);
                 });
             } catch(e) {
-                document.getElementById('loading').innerText = "ERREUR RÉSEAU GITHUB";
+                document.getElementById('loading').innerText = "CONNECTION FAILED";
             }
         }
         load();

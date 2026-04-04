@@ -75,9 +75,9 @@
         <div id="clock">00:00:00</div>
     </div>
     <div class="footer-nav">
-        <div class="nav-link">AVF-CORE</div>       
-        <div class="sync-btn" onclick="sync()">ENVOYER ⬆️</div>
-        <div class="nav-link undo" onclick="undo()">UNDO ↩️</div>
+        <a href="archive.html" class="nav-link">📚 ARCHIVES RÉCENTES</a>       
+        <div class="sync-btn" onclick="sync()">ENVOYER PAQUET ⬆️</div>
+        <div class="nav-link undo" onclick="undo()">ANNULER ↩️</div>
     </div>
     <script>
         let localQueue = JSON.parse(localStorage.getItem('avf_queue') || '[]');
@@ -86,7 +86,12 @@
         function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }
         setInterval(updateClock, 1000); updateClock();
 
-        // Récupération automatique de l'URL du Proxy via GitHub (Public)
+        function checkStatus() {
+            const isFin = localQueue.some(e => e.event === 'FIN DE CRISE');
+            document.getElementById('btn-fin').classList.toggle('active', isFin);
+            document.getElementById('crisis-banner').style.display = isFin ? 'block' : 'none';
+        }
+
         async function fetchProxy() {
             try {
                 const r = await fetch('https://raw.githubusercontent.com/mkfprod2025-cloud/AVF-CORE/main/proxy_url.json');
@@ -109,9 +114,7 @@
             localQueue.push(payload);
             localStorage.setItem('avf_queue', JSON.stringify(localQueue));
             document.getElementById('crisis-log').innerHTML = localQueue.map(e => `[${e.time.split('T')[1].substring(0,5)}] ${e.event}`).reverse().join('<br>');
-            const isFin = event === 'FIN DE CRISE';
-            document.getElementById('btn-fin').classList.toggle('active', isFin);
-            document.getElementById('crisis-banner').style.display = isFin ? 'block' : 'none';
+            checkStatus();
         }
 
         async function sync() {
@@ -125,16 +128,16 @@
                 body: JSON.stringify({ events: localQueue, pwd: pwd })
             }).then(r => r.json()).then(d => {
                 if(d.status === 'success') {
-                    alert("Crise archivée !");
+                    alert("Paquet envoyé !");
                     localQueue = []; localStorage.setItem('avf_queue', '[]');
                     document.getElementById('crisis-log').innerHTML = "Prêt.";
-                    document.getElementById('btn-fin').classList.remove('active');
-                    document.getElementById('crisis-banner').style.display = 'none';
+                    checkStatus();
                 } else { alert("Erreur Code MKF."); }
             }).catch(() => alert("DataCave injoignable."));
         }
 
-        function undo() { if (localQueue.length > 0 && confirm("Annuler ?")) { localQueue.pop(); localStorage.setItem('avf_queue', JSON.stringify(localQueue)); document.getElementById('crisis-log').innerHTML = "Mis à jour."; } }
+        function undo() { if (localQueue.length > 0 && confirm("Annuler ?")) { localQueue.pop(); localStorage.setItem('avf_queue', JSON.stringify(localQueue)); document.getElementById('crisis-log').innerHTML = "Mis à jour."; checkStatus(); } }
+        checkStatus();
     </script>
 </body>
 </html>

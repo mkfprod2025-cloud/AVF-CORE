@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>COCKPIT CRISIS v5.4.2</title>
+    <title>COCKPIT CRISIS v5.4.3</title>
     <link rel="icon" type="image/x-icon" href="avficon.ico">
     <style>
         :root { --bg: #000000; --accent: #00FFFF; --text-light: #ffffff; --restored: #0000FF; }
@@ -19,32 +19,48 @@
         .restored-badge { font-size: 0.6rem; color: #FFF; background: var(--restored); padding: 2px 5px; border-radius: 3px; font-weight: bold; margin-left: 5px; }  
         #sync-status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 5px; background: #333; color: #aaa; }
         #sync-status.online { background: #004400; color: #00FF00; }
-        #crisis-banner { display: none; width: 100%; background: #FF0000; color: white; padding: 8px; text-align: center; font-weight: 900; border: 3px solid white; border-radius: 10px; margin-bottom: 5px; animation: blink-red 1s infinite; }
-        @keyframes blink-red { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        #crisis-banner { display: none; width: 100%; background: #FF0000; color: white; padding: 12px; text-align: center; font-weight: 900; border: 3px solid white; border-radius: 10px; margin-bottom: 10px; animation: blink-red 1s infinite; }
+        @keyframes blink-red { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         .grid-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; justify-content: center; }
         .grid-row { display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center; width: 100%; gap: 10px; }        
+        
         .btn-circle { width: 62px; height: 62px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 900; border: 3px solid #FFF; color: #000; cursor: pointer; }
         .btn-circle i { font-size: 1.6rem; font-style: normal; margin-bottom: 2px; }
+        
         #crisis-log { width: 100%; height: 60px; background: #111; border: 1px solid #333; border-radius: 8px; margin: 10px 0; padding: 5px; overflow-y: auto; font-family: monospace; font-size: 0.7rem; color: #00FF00; }
         .action-row { display: flex; justify-content: center; width: 100%; gap: 10px; }
+        
         .btn-wide { flex: 1; height: 75px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 900; border: 3px solid #FFF; color: #000; cursor: pointer; }
         .btn-wide i { font-size: 2rem; font-style: normal; }     
-        .btn-eau { background: #00FFFF; } .btn-nasal { background: #0080FF; } .btn-zombie { background: #FFFF00; border: 5px solid #FF0000; }
-        .btn-fin { background: #FFF; border: 4px solid #00FF00; color: #000; } .btn-fin.active { background: #00FF00; color: #000; box-shadow: 0 0 30px #00FF00; border: 5px solid #FFF; }
-        .btn-cafe { background: #FF00FF; } .btn-epaule { background: #FF0000; } .btn-night { background: #FFD700; }
-        .btn-grign { background: #FFFF00; } .btn-agite { background: #FF00FF; } .btn-repas { background: #FF4500; }
-        .btn-oeil { background: #FF0000; } .btn-ejection { background: #FF8C00; } .btn-menthe { background: #98FB98; }
-        .btn-reson { background: #9370DB; } .btn-chal { background: #FFFF00; }
-        #clock { font-family: monospace; font-size: 2rem; color: var(--accent); font-weight: 900; text-align: center; margin-bottom: 10px; }
-        .footer-nav { width: 100%; display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #333; }  
+
+        /* --- COULEURS ORIGINALES RESTAURÉES --- */
+        .btn-eau { background: #00FFFF; }
+        .btn-nasal { background: #0080FF; }
+        .btn-zombie { background: #FFFF00; border: 5px solid #FF0000; }
+        .btn-fin { background: #FFF; border: 4px solid #00FF00; color: #000; }
+        .btn-fin.active { background: #00FF00; color: #000; box-shadow: 0 0 30px #00FF00; border: 5px solid #FFF; }
+        .btn-cafe { background: #FF00FF; }
+        .btn-epaule { background: #FF0000; }
+        .btn-night { background: #FFD700; }
+        .btn-grign { background: #FFFF00; }
+        .btn-agite { background: #FF00FF; }
+        .btn-repas { background: #FF4500; }
+        .btn-oeil { background: #FF0000; }
+        .btn-ejection { background: #FF8C00; } 
+        .btn-menthe { background: #98FB98; } 
+        .btn-reson { background: #9370DB; } 
+        .btn-chal { background: #FFFF00; }
+
+        #clock { font-family: monospace; font-size: 2.2rem; color: var(--accent); font-weight: 900; text-align: center; margin-bottom: 10px; text-shadow: 0 0 10px var(--accent); }
+        .footer-nav { width: 100%; display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #333; margin-top: 10px; }  
         .nav-link { color: #666; text-decoration: none; font-weight: bold; font-size: 0.8rem; }
         .undo { color: #FF0000; cursor: pointer; }
-        .sync-btn { color: #00FF00; font-weight: 900; cursor: pointer; }
+        .sync-btn { color: #00FF00; font-weight: 900; cursor: pointer; background: #003300; padding: 5px 10px; border-radius: 10px; border: 1px solid #00FF00; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="title">COCKPIT v5.4.2 <span class="restored-badge">MKFPROD</span></div>
+        <div class="title">COCKPIT v5.4.3 <span class="restored-badge">MKFPROD</span></div>
         <div id="sync-status">LINKING...</div>     
     </div>
     <div id="crisis-banner">🚨 CRISE EN COURS 🚨</div>
@@ -67,7 +83,7 @@
             <div class="btn-circle btn-menthe" onclick="log('MENTHE', this)"><i>🌿</i>MENTHE</div>
             <div class="btn-circle btn-reson" onclick="log('RESONNANCE', this)"><i>🔊</i>RESON.</div>
         </div>
-        <div id="crisis-log">Prêt.</div>       
+        <div id="crisis-log">En attente d'événements...</div>       
         <div class="action-row">
             <div class="btn-wide btn-night" onclick="log('JOUR/NUIT', this)"><i>🌗</i>NIGHT</div>
             <div class="btn-wide btn-zombie" onclick="log('ZOMBIE', this)"><i>💥</i>ZOMBIE</div>
@@ -90,27 +106,27 @@
         function checkUIState() {
             const hasEvents = localQueue.length > 0;
             const isFinClicked = localQueue.some(e => e.event === 'FIN DE CRISE');
-            
-            // Bannière rouge : Visible tant qu'il y a des événements et qu'on n'a pas cliqué sur FIN
             document.getElementById('crisis-banner').style.display = (hasEvents && !isFinClicked) ? 'block' : 'none';
-            // Bouton FIN : Vert si une crise est ouverte
             document.getElementById('btn-fin').classList.toggle('active', hasEvents && !isFinClicked);
-            // Log : Affichage du dernier historique
             if(hasEvents) {
-                document.getElementById('crisis-log').innerHTML = localQueue.map(e => `[${e.time.split('T')[1].substring(0,5)}] ${e.event}`).reverse().join('<br>');
+                document.getElementById('crisis-log').innerHTML = localQueue.map(e => `[${e.time.split('T')[1].substring(0,8)}] ${e.event}`).reverse().join('<br>');
             } else {
-                document.getElementById('crisis-log').innerHTML = "Prêt.";
+                document.getElementById('crisis-log').innerHTML = "En attente d'événements...";
             }
         }
 
         async function fetchProxy() {
             try {
-                const r = await fetch('https://raw.githubusercontent.com/mkfprod2025-cloud/AVF-CORE/main/proxy_url.json');
+                const r = await fetch('https://raw.githubusercontent.com/mkfprod2025-cloud/AVF-CORE/main/proxy_url.json?v=' + Date.now());
                 const d = await r.json();
                 proxyUrl = d.url;
                 document.getElementById('sync-status').innerText = "LINKED ✔️";
                 document.getElementById('sync-status').classList.add('online');
-            } catch(e) { document.getElementById('sync-status').innerText = "OFFLINE ❌"; }
+                console.log("[Proxy] URL detectée : " + proxyUrl);
+            } catch(e) { 
+                document.getElementById('sync-status').innerText = "OFFLINE ❌";
+                console.error("[Proxy] Erreur de lecture : ", e);
+            }
         }
         fetchProxy();
 
@@ -130,8 +146,9 @@
         async function sync() {
             if (localQueue.length === 0) return;
             const pwd = localStorage.getItem('avf_pwd');
-            if (!proxyUrl) { await fetchProxy(); if(!proxyUrl) return alert("Proxy introuvable."); }
+            if (!proxyUrl) { await fetchProxy(); if(!proxyUrl) return alert("Proxy introuvable. Rafraichissez."); }
             
+            console.log("[Sync] Envoi vers " + proxyUrl);
             fetch(proxyUrl + '/sync', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -141,8 +158,11 @@
                     alert("Paquet envoyé !");
                     localQueue = []; localStorage.setItem('avf_queue', '[]');
                     checkUIState();
-                } else { alert("Erreur Code MKF."); }
-            }).catch(() => alert("DataCave injoignable."));
+                } else { alert("Erreur Code MKF : " + d.message); }
+            }).catch((e) => {
+                console.error("[Sync] Erreur : ", e);
+                alert("DataCave injoignable. Vérifiez le tunnel.");
+            });
         }
 
         function undo() { if (localQueue.length > 0 && confirm("Annuler ?")) { localQueue.pop(); localStorage.setItem('avf_queue', JSON.stringify(localQueue)); checkUIState(); } }

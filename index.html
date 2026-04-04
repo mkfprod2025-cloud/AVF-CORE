@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>COCKPIT CRISIS v5.3.0-GH</title>
+    <title>COCKPIT CRISIS v5.3.1</title>
     <link rel="icon" type="image/x-icon" href="avficon.ico">
-    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --bg: #000000;
@@ -25,19 +24,18 @@
 
         .header { width: 100%; text-align: center; padding: 5px 0; display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; }
         .title { font-size: 1.1rem; font-weight: 900; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }     
-        .restored-badge { font-size: 0.6rem; color: #FFF; background: var(--restored); padding: 2px 5px; border-radius: 3px; font-weight: bold; margin-left: 5px; animation: blink 2s infinite; }  
+        .restored-badge { font-size: 0.6rem; color: #FFF; background: var(--restored); padding: 2px 5px; border-radius: 3px; font-weight: bold; margin-left: 5px; }  
 
-        #sync-status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 5px; background: #333; color: #aaa; }
+        #sync-status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 5px; background: #333; color: #aaa; cursor: pointer; }
         #sync-status.online { background: #004400; color: #00FF00; }
-        #sync-status.pending { background: #444400; color: #FFFF00; animation: blink 1s infinite; }
 
         #crisis-banner {
             display: none; width: 100%; background: #FF0000; color: white;
             padding: 8px; text-align: center; font-weight: 900; border: 3px solid white;
             border-radius: 10px; margin-bottom: 5px;
-            animation: blink 1s infinite;
+            animation: blink-red 1s infinite;
         }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes blink-red { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
         .grid-container {
             width: 100%; max-width: 450px; display: flex; flex-direction: column;
@@ -50,7 +48,7 @@
             width: 62px; height: 62px; border-radius: 50%;       
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-size: 0.55rem; font-weight: 900; border: 3px solid #FFF;
-            color: #000;
+            color: #000; cursor: pointer;
         }
         .btn-circle i { font-size: 1.6rem; font-style: normal; margin-bottom: 2px; }
 
@@ -65,7 +63,7 @@
             flex: 1; height: 75px; border-radius: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             font-size: 0.8rem; font-weight: 900; border: 3px solid #FFF;
-            color: #000;
+            color: #000; cursor: pointer;
         }
         .btn-wide i { font-size: 2rem; font-style: normal; }     
 
@@ -83,9 +81,9 @@
         .btn-agite { background: #FF00FF; }
         .btn-repas { background: #FF4500; }
         .btn-oeil { background: #FF0000; }
-        .btn-ejection { background: #FF8C00; } /* ORANGE ÉJECTION */
-        .btn-menthe { background: #98FB98; } /* VERT MENTHE */
-        .btn-reson { background: #9370DB; } /* VIOLET RESONNANCE */
+        .btn-ejection { background: #FF8C00; }
+        .btn-menthe { background: #98FB98; }
+        .btn-reson { background: #9370DB; }
         .btn-chal { background: #FFFF00; }
 
         #clock {
@@ -96,15 +94,15 @@
 
         .footer-nav { width: 100%; display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #333; }  
         .nav-link { color: #666; text-decoration: none; font-weight: bold; font-size: 0.8rem; }
-        .undo { color: #FF0000; }
+        .undo { color: #FF0000; cursor: pointer; }
         .sync-btn { color: #00FF00; font-weight: 900; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="title">COCKPIT v5.3.0 <span class="restored-badge">GITHUB SYNC</span></div>
-        <div id="sync-status" onclick="config_git()">CONFIG ⚙️</div>     
+        <div class="title">COCKPIT v5.3.1 <span class="restored-badge">OPEN CORE</span></div>
+        <div id="sync-status" onclick="config_git()">SETUP ⚙️</div>     
     </div>
 
     <div id="crisis-banner">🚨 CRISE EN COURS 🚨</div>
@@ -131,7 +129,7 @@
             <div class="btn-circle btn-reson" onclick="log('RESONNANCE', this)"><i>🔊</i>RESON.</div>
         </div>
 
-        <div id="crisis-log">Attente d'événements...</div>       
+        <div id="crisis-log">Prêt pour nouvelle crise.</div>       
 
         <div class="action-row">
             <div class="btn-wide btn-night" onclick="log('JOUR/NUIT', this)"><i>🌗</i>NIGHT</div>
@@ -143,30 +141,37 @@
     </div>
 
     <div class="footer-nav">
-        <a href="https://github.com/mkfprod/AVF-CORE/issues" target="_blank" class="nav-link">📚 ARCHIVES GH</a>       
-        <div class="sync-btn" onclick="sync()">ENVOYER PAQUET ⬆️</div>
-        <div class="nav-link undo" onclick="undo()">ANNULER ↩️</div>
+        <a id="archive-link" href="#" target="_blank" class="nav-link">📚 ARCHIVES GH</a>       
+        <div class="sync-btn" onclick="sync()">ENVOYER ⬆️</div>
+        <div class="nav-link undo" onclick="undo()">UNDO ↩️</div>
     </div>
 
     <script>
         let localQueue = JSON.parse(localStorage.getItem('avf_queue') || '[]');
-
+        
         function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }
         setInterval(updateClock, 1000); updateClock();
 
         function config_git() {
-            const token = prompt("GITHUB TOKEN (PAT) :");
-            const repo = prompt("REPO (ex: mkfprod/AVF-CORE) :");
+            const token = prompt("GITHUB TOKEN (ghp_...):", localStorage.getItem('gh_token') || "");
+            const repo = prompt("REPO (user/repo):", localStorage.getItem('gh_repo') || "mkfprod2025-cloud/AVF-CORE");
             if(token && repo) {
-                localStorage.setItem('gh_token', token);
-                localStorage.setItem('gh_repo', repo);
-                alert("Configuration GitHub Sauvegardée.");
+                localStorage.setItem('gh_token', token.trim());
+                localStorage.setItem('gh_repo', repo.trim());
+                updateArchiveLink();
+                alert("Sauvegardé.");
             }
         }
 
+        function updateArchiveLink() {
+            const repo = localStorage.getItem('gh_repo');
+            if(repo) document.getElementById('archive-link').href = `https://github.com/${repo}/issues`;
+        }
+        updateArchiveLink();
+
         function log(event, element) {
             let pwd = localStorage.getItem('avf_pwd');
-            if (!pwd || pwd !== '152397') {
+            if (pwd !== '152397') {
                 pwd = prompt("CODE MKFPROD :");
                 if (pwd === '152397') localStorage.setItem('avf_pwd', pwd);
                 else return;
@@ -178,26 +183,31 @@
             }
             if (navigator.vibrate) navigator.vibrate(50);        
 
-            const payload = { event, pwd, time: new Date().toISOString().replace('T', ' ').substring(0, 19) };
+            const payload = { event, time: new Date().toISOString().replace('T', ' ').substring(0, 19) };
             localQueue.push(payload);
             localStorage.setItem('avf_queue', JSON.stringify(localQueue));
-            document.getElementById('crisis-log').innerHTML = localQueue.map(e => `[${e.time.split(' ')[1]}] ${e.event}`).reverse().join('<br>');
+            
+            const logContent = localQueue.map(e => `[${e.time.split(' ')[1]}] ${e.event}`).reverse().join('<br>');
+            document.getElementById('crisis-log').innerHTML = logContent;
             
             if(event === 'FIN DE CRISE') {
                 document.getElementById('btn-fin').classList.add('active');
                 document.getElementById('crisis-banner').style.display = 'block';
+            } else {
+                document.getElementById('crisis-banner').style.display = 'none';
+                document.getElementById('btn-fin').classList.remove('active');
             }
         }
 
         function sync() {
             const token = localStorage.getItem('gh_token');
             const repo = localStorage.getItem('gh_repo');
-            if (!token || !repo) { alert("Configurez GitHub d'abord (Bouton CONFIG)."); return; }
-            if (localQueue.length === 0) { alert("Rien à envoyer."); return; }
+            if (!token || !repo) { alert("Configurez le SETUP ⚙️"); return; }
+            if (localQueue.length === 0) { alert("File vide."); return; }
 
             const timestamp = new Date().toISOString();
             const body = {
-                title: `[CRISIS_PACKET] ${timestamp}`,
+                title: `[AVF_PACKET] ${timestamp}`,
                 body: "```json\n" + JSON.stringify(localQueue, null, 2) + "\n```",
                 labels: ["crisis-log"]
             };
@@ -211,23 +221,24 @@
                 body: JSON.stringify(body)
             }).then(r => {
                 if(r.ok) {
-                    alert("Paquet envoyé à GitHub !");
+                    alert("Envoyé !");
                     localQueue = [];
                     localStorage.setItem('avf_queue', '[]');
-                    document.getElementById('crisis-log').innerHTML = "Prêt.";
+                    document.getElementById('crisis-log').innerHTML = "Prêt pour nouvelle crise.";
                     document.getElementById('btn-fin').classList.remove('active');
                     document.getElementById('crisis-banner').style.display = 'none';
                 } else {
-                    alert("Erreur d'envoi. Vérifiez votre Token.");
+                    alert("Erreur. Vérifiez le Token.");
                 }
             });
         }
 
         function undo() {
-            if (confirm("Annuler dernier clic ?")) {
+            if (localQueue.length > 0 && confirm("Annuler ?")) {
                 localQueue.pop();
                 localStorage.setItem('avf_queue', JSON.stringify(localQueue));
-                document.getElementById('crisis-log').innerHTML = localQueue.map(e => `[${e.time.split(' ')[1]}] ${e.event}`).reverse().join('<br>');
+                document.getElementById('crisis-log').innerHTML = localQueue.length > 0 ? 
+                    localQueue.map(e => `[${e.time.split(' ')[1]}] ${e.event}`).reverse().join('<br>') : "Prêt.";
             }
         }
     </script>

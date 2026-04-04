@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>COCKPIT CRISIS v5.4.6 [NEW]</title>
-    <link rel="icon" type="image/x-icon" href="avficon.ico?v=5.4.6">
+    <title>COCKPIT CRISIS v5.4.7</title>
+    <link rel="icon" type="image/png" href="avficon.png">
+    <link rel="manifest" href="manifest.json">
     <style>
         :root { --bg: #000000; --accent: #00FFFF; --text-light: #ffffff; --restored: #0000FF; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
@@ -15,7 +16,8 @@
             overflow-x: hidden; overflow-y: auto; padding: env(safe-area-inset-top) 10px 120px 20px;
         }
         .header { width: 100%; text-align: center; padding: 5px 15px; display: flex; justify-content: space-between; align-items: center; }
-        .title { font-size: 1.1rem; font-weight: 900; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }     
+        .logo-header { width: 24px; height: 24px; margin-right: 8px; vertical-align: middle; }
+        .title { font-size: 1.1rem; font-weight: 900; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; }     
         .restored-badge { font-size: 0.6rem; color: #FFF; background: var(--restored); padding: 2px 5px; border-radius: 3px; font-weight: bold; margin-left: 5px; }  
         #sync-status { font-size: 0.7rem; font-weight: bold; padding: 4px 8px; border-radius: 5px; background: #333; color: #aaa; cursor: pointer; }
         #sync-status.online { background: #004400; color: #00FF00; }
@@ -37,14 +39,15 @@
         .btn-oeil { background: #FF0000; } .btn-ejection { background: #FF8C00; } .btn-menthe { background: #98FB98; }
         .btn-reson { background: #9370DB; } .btn-chal { background: #FFFF00; }
         #clock { font-family: monospace; font-size: 2.2rem; color: var(--accent); font-weight: 900; text-align: center; margin-bottom: 10px; text-shadow: 0 0 10px var(--accent); }
-        .footer-nav { width: 100%; display: flex; justify-content: space-between; padding: 15px 0; border-top: 1px solid #333; position: sticky; bottom: 0; background: #000; z-index: 100; }  
+        .footer-nav { width: 100%; display: flex; justify-content: space-between; padding: 15px 0; border-top: 1px solid #333; position: sticky; bottom: 0; background: #000; z-index: 100; align-items: center; }  
         .nav-link { color: #00FFFF; text-decoration: none; font-weight: bold; font-size: 0.8rem; border: 1px solid #00FFFF; padding: 8px 12px; border-radius: 5px; }
         .sync-btn { color: #00FF00; font-weight: 900; cursor: pointer; background: #002200; padding: 10px 20px; border-radius: 10px; border: 2px solid #00FF00; }
+        .logo-footer { width: 20px; height: 20px; opacity: 0.5; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="title">COCKPIT v5.4.6 <span class="restored-badge">MKFPROD</span></div>
+        <div class="title"><img src="avficon.png" class="logo-header">COCKPIT v5.4.7</div>
         <div id="sync-status" onclick="fetchProxy()">LINKING...</div>     
     </div>
     <div id="crisis-banner">🚨 CRISE EN COURS 🚨</div>
@@ -76,8 +79,9 @@
         <div id="clock">00:00:00</div>
     </div>
     <div class="footer-nav">
-        <a href="archive.html?v=5.4.6" class="nav-link">📚 ARCHIVES</a>       
+        <a href="archive.html" class="nav-link">📚 ARCHIVES</a>       
         <div class="sync-btn" onclick="sync()">ENVOYER PAQUET ⬆️</div>
+        <img src="avficon.png" class="logo-footer">
         <div class="nav-link" style="color:#FF0000; border-color:#FF0000;" onclick="undo()">UNDO ↩️</div>
     </div>
     <script>
@@ -101,7 +105,7 @@
 
         async function fetchProxy() {
             try {
-                const r = await fetch('https://raw.githubusercontent.com/mkfprod2025-cloud/AVF-CORE/main/proxy_url.json?nocache=' + Date.now());
+                const r = await fetch('https://raw.githubusercontent.com/mkfprod2025-cloud/AVF-CORE/main/proxy_url.json?v=' + Date.now());
                 const d = await r.json(); proxyUrl = d.url;
                 document.getElementById('sync-status').innerText = "LINKED ✔️";
                 document.getElementById('sync-status').classList.add('online');

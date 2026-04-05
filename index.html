@@ -162,10 +162,12 @@
         async function pushToGitHub(events) {
             const token = localStorage.getItem('gh_token');
             const repo = localStorage.getItem('gh_repo');
-            const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            
+            // On utilise l'heure du premier événement de la crise pour le titre
+            const firstTime = new Date(events[0].time).toLocaleString('fr-FR');
             
             const payload = {
-                title: `[CRISIS_REPORT] ${timestamp}`,
+                title: `[CRISIS] ${firstTime}`,
                 body: "```json\n" + JSON.stringify(events, null, 2) + "\n```",
                 labels: ["crisis-log"]
             };

@@ -67,8 +67,8 @@
                                 displayDate = new Date(events[0].time).toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
                             }
                             eventsHtml = events.map(e => {
-                                const t = e.time ? (e.time.includes('T') ? e.time.split('T')[1].substring(0,5) : e.time) : "??:??";
-                                return `<div class="event-line"><span class="time">[${t}]</span> <span class="label">${e.event}</span></div>`;
+                                // Formatage de l'heure avec fuseau horaire explicite (Europe/Paris)
+                                const t = e.time ? new Date(e.time).toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' }) : "??:??";                                return `<div class="event-line"><span class="time">[${t}]</span> <span class="label">${e.event}</span></div>`;
                             }).join('');
                         } catch(e) { eventsHtml = "<div style='color:red;padding:10px;'>FORMAT ERR (OLD VERSION)</div>"; }
                     }

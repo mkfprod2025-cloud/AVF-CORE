@@ -138,7 +138,10 @@
             document.getElementById('btn-fin').classList.toggle('active', hasEvents && !isFin);
             const logDiv = document.getElementById('crisis-log');
             if(hasEvents) {
-                logDiv.innerHTML = localQueue.map(e => `[${e.time.split('T')[1].substring(0,8)}] ${e.event}`).reverse().join('<br>');
+                logDiv.innerHTML = localQueue.map(e => {
+                    const localTime = new Date(e.time).toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris' });
+                    return `[${localTime}] ${e.event}`;
+                }).reverse().join('<br>');
             } else { logDiv.innerHTML = "Prêt pour nouvelle crise."; }
         }
 
@@ -163,8 +166,8 @@
             const token = localStorage.getItem('gh_token');
             const repo = localStorage.getItem('gh_repo');
             
-            // On utilise l'heure du premier événement de la crise pour le titre
-            const firstTime = new Date(events[0].time).toLocaleString('fr-FR');
+            // On utilise l'heure du premier événement de la crise pour le titre avec fuseau horaire explicite
+            const firstTime = new Date(events[0].time).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
             
             const payload = {
                 title: `[CRISIS] ${firstTime}`,

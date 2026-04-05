@@ -47,10 +47,21 @@
 </head>
 <body>
     <div class="header">
-        <div class="title"><img src="avficon.png" class="logo-header">COCKPIT v5.4.7</div>
-        <div id="sync-status" onclick="fetchProxy()">LINKING...</div>     
+        <div class="title"><img src="avficon.png" class="logo-header">COCKPIT v5.5.0</div>
+        <div id="sync-status" onclick="openConfig()">CONFIG ⚙️</div>     
     </div>
     <div id="crisis-banner">🚨 CRISE EN COURS 🚨</div>
+
+    <!-- Modal de Configuration -->
+    <div id="config-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; padding:20px; flex-direction:column; justify-content:center; align-items:center;">
+        <div style="background:#111; padding:30px; border-radius:20px; border:2px solid var(--accent); width:100%; max-width:400px;">
+            <h2 style="color:var(--accent); margin-bottom:20px; text-align:center;">CONFIGURATION</h2>
+            <input type="password" id="cfg-token" placeholder="GitHub Token (PAT)" style="width:100%; padding:15px; margin-bottom:15px; background:#222; border:1px solid #444; color:white; border-radius:10px;">
+            <input type="text" id="cfg-repo" placeholder="Repo (ex: user/repo)" style="width:100%; padding:15px; margin-bottom:25px; background:#222; border:1px solid #444; color:white; border-radius:10px;">
+            <button onclick="saveConfig()" style="width:100%; background:var(--accent); color:black; padding:15px; border:none; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer;">SAUVEGARDER</button>
+            <button onclick="document.getElementById('config-modal').style.display='none'" style="width:100%; background:transparent; color:#666; padding:10px; border:none; margin-top:10px; cursor:pointer;">Annuler</button>
+        </div>
+    </div>
     <div class="grid-container">
         <div class="grid-row">
             <div class="btn-circle btn-eau" onclick="log('EAU', this)"><i>💧</i>EAU</div>
@@ -86,11 +97,39 @@
     </div>
     <script>
         let localQueue = JSON.parse(localStorage.getItem('avf_queue') || '[]');
-        let proxyUrl = "";
         let isLocked = false;
 
         function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }
         setInterval(updateClock, 1000); updateClock();
+
+        function openConfig() {
+            document.getElementById('cfg-token').value = localStorage.getItem('gh_token') || "";
+            document.getElementById('cfg-repo').value = localStorage.getItem('gh_repo') || "mkfprod2025-cloud/AVF-CORE";
+            document.getElementById('config-modal').style.display = 'flex';
+        }
+
+        function saveConfig() {
+            localStorage.setItem('gh_token', document.getElementById('cfg-token').value);
+            localStorage.setItem('gh_repo', document.getElementById('cfg-repo').value);
+            document.getElementById('config-modal').style.display = 'none';
+            checkSyncStatus();
+        }
+
+        function checkSyncStatus() {
+            const token = localStorage.getItem('gh_token');
+            const repo = localStorage.getItem('gh_repo');
+            const status = document.getElementById('sync-status');
+            if (token && repo) {
+                status.innerText = "AUTONOME ✔️";
+                status.style.background = "#004400";
+                status.style.color = "#00FF00";
+            } else {
+                status.innerText = "CONFIG REQUIS ⚠️";
+                status.style.background = "#440000";
+                status.style.color = "#FF0000";
+            }
+        }
+        checkSyncStatus();
 
         function checkUIState() {
             const hasEvents = localQueue.length > 0;
@@ -102,16 +141,6 @@
                 logDiv.innerHTML = localQueue.map(e => `[${e.time.split('T')[1].substring(0,8)}] ${e.event}`).reverse().join('<br>');
             } else { logDiv.innerHTML = "Prêt pour nouvelle crise."; }
         }
-
-        async function fetchProxy() {
-            try {
-                const r = await fetch('https://raw.githubusercontent.com/mkfprod2025-cloud/AVF-CORE/main/proxy_url.json?v=' + Date.now());
-                const d = await r.json(); proxyUrl = d.url;
-                document.getElementById('sync-status').innerText = "LINKED ✔️";
-                document.getElementById('sync-status').classList.add('online');
-            } catch(e) { document.getElementById('sync-status').innerText = "OFFLINE ❌"; }
-        }
-        fetchProxy();
 
         function log(event, element) {
             if(isLocked) return;
@@ -130,21 +159,59 @@
             checkUIState();
         }
 
+        async function pushToGitHub(events) {
+            const token = localStorage.getItem('gh_token');
+            const repo = localStorage.getItem('gh_repo');
+            const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            
+            const payload = {
+                title: `[CRISIS_REPORT] ${timestamp}`,
+                body: "```json\n" + JSON.stringify(events, null, 2) + "\n```",
+                labels: ["crisis-log"]
+            };
+
+            try {
+                const r = await fetch(`https://api.github.com/repos/${repo}/issues`, {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                return r.ok;
+            } catch(e) { return false; }
+        }
+
         async function sync() {
             if (localQueue.length === 0) return;
-            const pwd = localStorage.getItem('avf_pwd');
-            if (!proxyUrl) { await fetchProxy(); if(!proxyUrl) return alert("Proxy introuvable."); }
+            if (!localStorage.getItem('gh_token')) { alert("Configurez GitHub d'abord (Bouton CONFIG)."); openConfig(); return; }
             
-            const cleanData = localQueue.map(e => ({ event: e.event, time: e.time }));
-            fetch(proxyUrl + '/sync', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ events: cleanData, pwd: pwd })
-            }).then(r => r.json()).then(d => {
-                if(d.status === 'success') {
-                    alert("Succès !"); localQueue = []; localStorage.setItem('avf_queue', '[]'); checkUIState();
-                } else { alert("Erreur : " + d.message); fetchProxy(); }
-            }).catch(() => { alert("Erreur connexion DataCave."); fetchProxy(); });
+            let crises = [];
+            let currentCrisis = [];
+            
+            localQueue.forEach(e => {
+                currentCrisis.push(e);
+                if (e.event === 'FIN DE CRISE') {
+                    crises.push([...currentCrisis]);
+                    currentCrisis = [];
+                }
+            });
+            if (currentCrisis.length > 0) crises.push(currentCrisis);
+
+            let successCount = 0;
+            for (const crisis of crises) {
+                const ok = await pushToGitHub(crisis);
+                if (ok) successCount++;
+            }
+
+            if (successCount === crises.length) {
+                alert("Succès ! " + successCount + " crise(s) envoyée(s) à la Librairie.");
+                localQueue = []; localStorage.setItem('avf_queue', '[]'); checkUIState();
+            } else {
+                alert("Erreur partielle : " + successCount + "/" + crises.length + " envoyées. Vérifiez votre connexion ou votre Token.");
+            }
         }
 
         function undo() { if (localQueue.length > 0 && confirm("Annuler ?")) { localQueue.pop(); localStorage.setItem('avf_queue', JSON.stringify(localQueue)); checkUIState(); } }
